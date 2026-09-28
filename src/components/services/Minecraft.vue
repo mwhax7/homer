@@ -37,6 +37,18 @@ export default {
       max: 0,
     },
   }),
+  computed: {
+    // The status API takes a bare `host[:port]`, so drop any scheme and path.
+    server: function () {
+      return (this.item.url || "")
+        .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
+        .replace(/\/.*$/, "");
+    },
+    details: function () {
+      const players = `${this.players.online}/${this.players.max} players`;
+      return [this.software, this.version, players].filter(Boolean).join(" | ");
+    },
+  },
   created() {
     // Set up auto-update method for the scheduler
     this.autoUpdateMethod = this.fetchServerStatus;
