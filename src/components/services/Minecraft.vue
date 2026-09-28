@@ -46,27 +46,32 @@ export default {
   },
   methods: {
     fetchServerStatus: async function () {
-      const host = this.item.host || "127.0.0.1";
-      const port = this.item.port || 25565;
+      if (!this.server) {
+        console.error(
+          `Minecraft: "${this.item.name}" is missing the url option`,
+        );
+        this.status = "error";
+        return;
+      }
 
-      window
-        .fetch(`https://api.mcsrvstat.us/2/${host}:${port}`)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.online) {
-            this.status = "running";
-            this.software = data.software || "Unknown";
-            this.version = data.version || "N/A";
-            this.players.online = data.players?.online || 0;
-            this.players.max = data.players?.max || 0;
-          } else {
-            this.status = "stopped";
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          this.status = "error";
-        });
+      try {
+        const data = await this.fetch(this.server);
+
+        if (!data.online) {
+          this.status = "stopped";
+          return;
+        }
+
+        this.status = "running";
+        // Both are optional and free form: plenty of servers report neither.
+        this.software = data.software || "";
+        this.version = data.version || "";
+        this.players.online = data.players?.online || 0;
+        this.players.max = data.players?.max || 0;
+      } catch (e) {
+        console.error(e);
+        this.status = "error";
+      }
     },
   },
 };
