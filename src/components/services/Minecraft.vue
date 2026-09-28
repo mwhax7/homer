@@ -50,6 +50,12 @@ export default {
     },
   },
   created() {
+    // Minecraft speaks its own TCP protocol, so an HTTP intermediary is required.
+    // Point `endpoint` at a self hosted one to avoid the third party default.
+    if (!this.item.endpoint) {
+      this.endpoint = DEFAULT_API;
+    }
+
     // Set up auto-update method for the scheduler
     this.autoUpdateMethod = this.fetchServerStatus;
 
