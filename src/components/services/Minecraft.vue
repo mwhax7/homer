@@ -7,7 +7,7 @@
           {{ item.subtitle }}
         </template>
         <template v-else-if="status === 'running'">
-          {{ software }} | v{{ version }} | {{ players.online }}/{{ players.max }} players
+          {{ details }}
         </template>
       </p>
     </template>
