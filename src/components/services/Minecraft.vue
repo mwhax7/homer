@@ -1,5 +1,5 @@
 <template>
-  <Generic :item="item">
+  <Generic :item="displayItem">
     <template #content>
       <p class="title is-4">{{ item.name }}</p>
       <p class="subtitle is-6">
@@ -11,6 +11,7 @@
         </template>
       </p>
     </template>
+
     <template #indicator>
       <div v-if="status" class="status" :class="status">
         {{ status }}
@@ -22,74 +23,94 @@
 <script>
 import service from "@/mixins/service.js";
 
+const MINECRAFT_API = "https://api.mcsrvstat.us/3";
+
 export default {
   name: "Minecraft",
+
   mixins: [service],
+
   props: {
     item: Object,
   },
+
   data: () => ({
     status: "",
     software: "",
     version: "",
+    logo: "",
     players: {
       online: 0,
       max: 0,
     },
   }),
+
   computed: {
-    // The status API takes a bare `host[:port]`, so drop any scheme and path.
-    server: function () {
-      return (this.item.url || "")
-        .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
-        .replace(/\/.*$/, "");
+    displayItem() {
+      if (!this.logo) {
+        return this.item;
+      }
+
+      return { ...this.item, logo: this.logo };
     },
-    details: function () {
+
+    server() {
+      return this.item.host || "";
+    },
+
+    details() {
       const players = `${this.players.online}/${this.players.max} players`;
-      return [this.software, this.version, players].filter(Boolean).join(" | ");
+
+      return [this.software, this.version, players]
+        .filter(Boolean)
+        .join(" | ");
     },
   },
+
   created() {
-    // Minecraft speaks its own TCP protocol, so an HTTP intermediary is required.
-    // Point `endpoint` at a self hosted one to avoid the third party default.
-    if (!this.item.endpoint) {
-      this.endpoint = DEFAULT_API;
-    }
-
-    // Set up auto-update method for the scheduler
+    this.endpoint = MINECRAFT_API;
     this.autoUpdateMethod = this.fetchServerStatus;
-
-    // Initial data fetch
     this.fetchServerStatus();
   },
+
   methods: {
-    fetchServerStatus: async function () {
+    fetchServerStatus() {
       if (!this.server) {
         console.error(
-          `Minecraft: "${this.item.name}" is missing the url option`,
+          `Minecraft: "${this.item.name}" is missing the host option`,
         );
+
         this.status = "error";
         return;
       }
 
-      try {
-        const data = await this.fetch(this.server);
+      return this.fetch(this.server)
+        .then((data) => {
+          if (!data.online) {
+            this.status = "stopped";
+            return;
+          }
 
-        if (!data.online) {
-          this.status = "stopped";
-          return;
-        }
+          this.status = "running";
 
-        this.status = "running";
-        // Both are optional and free form: plenty of servers report neither.
-        this.software = data.software || "";
-        this.version = data.version || "";
-        this.players.online = data.players?.online || 0;
-        this.players.max = data.players?.max || 0;
-      } catch (e) {
-        console.error(e);
-        this.status = "error";
-      }
+          this.software = data.software || "";
+          this.version = data.version || "";
+
+          if (data.icon) {
+            this.logo = data.icon;
+          }
+
+          this.players.online = data.players?.online || 0;
+          this.players.max = data.players?.max || 0;
+        })
+        .catch((error) => {
+          console.error(
+            `Minecraft: failed to fetch "${this.server}"`,
+            error,
+          );
+
+          this.status = "error";
+        });
     },
   },
 };
