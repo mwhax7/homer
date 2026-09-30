@@ -58,6 +58,10 @@ export default {
       return this.item.host || "";
     },
 
+    useServerIcon() {
+      return this.item.useServerIcon !== false;
+    },
+
     details() {
       const players = `${this.players.online}/${this.players.max} players`;
 
@@ -96,8 +100,10 @@ export default {
           this.software = data.software || "";
           this.version = data.version || "";
 
-          if (data.icon) {
+          if (data.icon && this.useServerIcon) {
             this.logo = data.icon;
+          } else {
+            this.logo = "";
           }
 
           this.players.online = data.players?.online || 0;
