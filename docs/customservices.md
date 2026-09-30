@@ -457,6 +457,7 @@ Displays the status of a Minecraft server using mcsrvstat.us.
   host: "SERVER_IP:PORT"
   url: "https://minecraft.net"
   logo: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/minecraft.svg"
+  useServerIcon: true
   type: Minecraft
 ```
 
@@ -467,6 +468,8 @@ This component uses the API from https://mcsrvstat.us/ to retrieve server inform
 You can use 'url' to insert a link to your server's website or dashboard such as 'Plan' or anything else you like.
 
 Enter the 'IP:PORT' of your chosen server in the 'host' field, you can also use its domain name, such as 'mc.hypixel.net'.
+
+'useServerIcon' is Optional: set to false to keep 'logo' instead of the server icon
 
 ## Miniflux
 
