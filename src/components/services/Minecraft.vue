@@ -6,7 +6,7 @@
         <template v-if="item.subtitle">
           {{ item.subtitle }}
         </template>
-        <template v-else-if="status === 'running'">
+        <template v-else-if="status === 'online'">
           {{ details }}
         </template>
       </p>
@@ -87,11 +87,11 @@ export default {
       return this.fetch(this.server)
         .then((data) => {
           if (!data.online) {
-            this.status = "stopped";
+            this.status = "offline";
             return;
           }
 
-          this.status = "running";
+          this.status = "online";
 
           this.software = data.software || "";
           this.version = data.version || "";
@@ -121,13 +121,13 @@ export default {
   font-size: 0.8rem;
   color: var(--text-title);
 
-  &.running:before {
+  &.online:before {
     background-color: #94e185;
     border-color: #78d965;
     box-shadow: 0 0 5px 1px #94e185;
   }
 
-  &.stopped:before,
+  &.offline:before,
   &.error:before {
     background-color: #c9404d;
     border-color: #c42c3b;
