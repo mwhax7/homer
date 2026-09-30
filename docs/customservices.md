@@ -454,12 +454,19 @@ Displays the status of a Minecraft server using mcsrvstat.us.
 
 ```yaml
 - name: "Minecraft"
-  url: "127.0.0.1:25565"
+  host: "SERVER_IP:PORT"
+  url: "https://minecraft.net"
   logo: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/minecraft.svg"
   type: Minecraft
 ```
 
-Shows the server type, version, and current online player count.
+Shows the server type, version, current online player count and server icon.
+
+This component uses the API from https://mcsrvstat.us/ to retrieve server information.
+
+You can use 'url' to insert a link to your server's website or dashboard such as 'Plan' or anything else you like.
+
+Enter the 'IP:PORT' of your chosen server in the 'host' field, you can also use its domain name, such as 'mc.hypixel.net'.
 
 ## Miniflux
 
